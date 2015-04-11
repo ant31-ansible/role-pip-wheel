@@ -1,0 +1,63 @@
+---
+- name: PIP-WHEEL | create wheel-directory-house archives
+  file: path={{wheel_home}}/all state=directory
+  with_items: python_packages
+  tags:
+    - pip-wheel-remote
+    - pip-wheel
+
+- name: PIP-WHEEL | Send archive
+  copy: src={{wheel_home}}/archives/{{item.name}}_{{item.version}}.tar dest={{wheel_home}}/all
+  with_items: python_packages
+  when: item.version is defined
+  tags:
+    - pip-wheel-remote
+    - pip-wheel
+
+- name: PIP-WHEEL | Send archive without_version
+  copy: src={{wheel_home}}/archives/{{item.name}}.tar dest={{wheel_home}}/all
+  with_items: python_packages
+  when: item.version is not defined
+  tags:
+    - pip-wheel-remote
+    - pip-wheel
+
+- name: PIP-WHEEL | Untar archives
+  shell: cd {{wheel_home}}/all/ && ls -1 *.tar | xargs -I{} tar xvf  {}
+  changed_when: False
+  tags:
+    - pip-wheel-remote
+    - pip-wheel
+
+
+- name: PIP-WHEEL | install package (w/o virtualenv  w/o version)
+  pip: name={{item.name}} extra_args="--use-wheel --no-index --find-links={{wheel_home}}/all"
+  when: item.virtualenv is not defined and item.version is not defined
+  with_items: python_packages
+  tags:
+    - pip-wheel-remote
+    - pip-wheel
+
+- name: PIP-WHEEL | install package (w/o virtualenv  w version)
+  pip: name={{item.name}} extra_args="--use-wheel --no-index --find-links={{wheel_home}}/all" version={{item.version}}
+  when: item.virtualenv is not defined and item.version is defined
+  with_items: python_packages
+  tags:
+    - pip-wheel-remote
+    - pip-wheel
+
+- name: PIP-WHEEL | install package (with virtualenv w version)
+  pip: name={{item.name}} extra_args="--use-wheel --no-index --find-links={{wheel_home}}/all" version={{item.version}} virtualenv={{item.virtualenv}}
+  when: item.virtualenv is defined and item.version is defined
+  with_items: python_packages
+  tags:
+    - pip-wheel-remote
+    - pip-wheel
+
+- name: PIP-WHEEL | install package (with virtualenv w/o version)
+  pip: name={{item.name}} extra_args="--use-wheel --no-index --find-links={{wheel_home}}/all" virtualenv={{item.virtualenv}}
+  when: item.virtualenv is defined and item.version is not defined
+  with_items: python_packages
+  tags:
+    - pip-wheel-remote
+    - pip-wheel

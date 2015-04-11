@@ -1,0 +1,35 @@
+---
+### INSTALL localy (deploy machine) and remotely (target machine)
+- name: PIP-WHEEL boostrap | copy wheel
+  copy: src=wheel-0.23.0.tar.gz dest=/tmp
+  tags:
+    - pip-wheel
+
+- name: PIP-WHEEL boostrap | copy pip
+  copy: src=pip-1.5.6.tar.gz dest=/tmp
+  tags:
+    - pip-wheel
+
+- name: PIP-WHEEL boostrap | untar pip
+  command: tar xzvf /tmp/pip-1.5.6.tar.gz -C /tmp
+  changed_when: False
+  tags:
+    - pip-wheel
+
+- name: PIP-WHEEL boostrap | untar wheel
+  command: tar xzvf /tmp/wheel-0.23.0.tar.gz -C /tmp
+  changed_when: False
+  tags:
+    - pip-wheel
+
+- name: PIP-WHEEL boostrap | install pip
+  shell: cd /tmp/pip-1.5.6/ && python setup.py install
+  changed_when: False
+  tags:
+    - pip-wheel
+
+- name: PIP-WHEEL boostrap | untar wheel
+  shell: cd /tmp/wheel-0.23.0 && python setup.py install
+  changed_when: False
+  tags:
+    - pip-wheel

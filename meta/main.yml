@@ -1,0 +1,11 @@
+---
+galaxy_info:
+  author: alegrand
+  description: Prepare pip-wheel for machine without internet access
+  company: Arkena
+  license: MIT
+  min_ansible_version: 1.6
+  categories:
+    - packaging
+dependencies:
+  - { role: offline-pip-install/bootstrap }

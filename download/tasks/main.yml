@@ -1,0 +1,45 @@
+---
+- name: PIP-WHEEL dl | create wheel-directory-house archives
+  file: path={{wheel_home}}/archives state=directory
+  with_items: python_packages
+  tags:
+    - pip-wheel
+
+- name: PIP-WHEEL dl | create wheel-directory-house
+  file: path={{wheel_home}}/packages/{{item.name}} state=directory
+  with_items: python_packages
+  tags:
+    - pip-wheel
+
+
+- name: PIP-WHEEL dl | download wheels with version
+  command: pip wheel --wheel-dir={{wheel_home}}/packages/{{item.name}} {{item.name}}=={{item.version}}
+  changed_when: False
+  when: item.version is defined
+  with_items: python_packages
+  tags:
+    - pip-wheel
+
+- name: PIP-WHEEL dl | download wheels latest version
+  command: pip wheel --wheel-dir={{wheel_home}}/packages/{{item.name}} {{item.name}}
+  changed_when: False
+  with_items: python_packages
+  when: item.version is not defined
+  tags:
+    - pip-wheel
+
+- name: PIP-WHEEL dl | tar packages (version)
+  command: tar cvf {{wheel_home}}/archives/{{item.name}}_{{item.version}}.tar -C {{wheel_home}}/packages/{{item.name}}_{{item.version}} .
+  changed_when: False
+  with_items: python_packages
+  when: item.version is defined
+  tags:
+    - pip-wheel
+
+- name: PIP-WHEEL dl | tar packages without version
+  command: tar cvf {{wheel_home}}/archives/{{item.name}}.tar -C {{wheel_home}}/packages/{{item.name}} .
+  changed_when: False
+  with_items: python_packages
+  when: item.version is not defined
+  tags:
+    - pip-wheel
