@@ -17,6 +17,9 @@ Define the list of packages to install as follow:
 ```yaml
 ---
 wheel_home: /var/cache/wheelhouse
+python_packages:
+  - {name: ansible, version: 1.9.1}
+  - {name: celery}
 ```
 
 Dependencies
